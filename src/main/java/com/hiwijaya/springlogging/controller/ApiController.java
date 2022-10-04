@@ -1,11 +1,16 @@
 package com.hiwijaya.springlogging.controller;
 
+import com.hiwijaya.springlogging.entity.Book;
 import com.hiwijaya.springlogging.model.LoginRequest;
+import com.hiwijaya.springlogging.model.SaveBookRequest;
 import com.hiwijaya.springlogging.service.AuthService;
+import com.hiwijaya.springlogging.service.BookService;
 import com.hiwijaya.springlogging.util.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -13,6 +18,9 @@ public class ApiController {
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private BookService bookService;
 
 
     @GetMapping("/")
@@ -31,10 +39,34 @@ public class ApiController {
     @GetMapping("/book")
     public ResponseEntity<Object> getBook(){
 
-        return ResponseHandler.createResponse("BOOK");
+        List<Book> books = bookService.getAllBooks();
+
+        return ResponseHandler.createResponse(books);
     }
 
+    @PostMapping("/book")
+    public ResponseEntity<Object> save(@RequestBody SaveBookRequest body){
 
+        bookService.save(body);
 
+        return ResponseHandler.ok();
+    }
 
+    @PutMapping("/book")
+    public ResponseEntity<Object> update(@RequestBody SaveBookRequest body){
+
+        bookService.save(body);
+
+        return ResponseHandler.ok();
+    }
+
+    @DeleteMapping("book/{id}")
+    public ResponseEntity<Object> delete(@PathVariable Integer id){
+
+        bookService.delete(id);
+
+        return ResponseHandler.ok();
+    }
+
+    
 }
