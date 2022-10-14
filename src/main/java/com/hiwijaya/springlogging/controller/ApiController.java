@@ -37,12 +37,20 @@ public class ApiController {
     }
 
     @GetMapping("/book")
-    public ResponseEntity<Object> getBook(){
+    public ResponseEntity<Object> getBook(@RequestParam(required = false) Integer id){
 
-        List<Book> books = bookService.getAllBooks();
+        if(id == null){
 
-        return ResponseHandler.createResponse(books);
+            List<Book> books = bookService.getAllBooks();
+
+            return ResponseHandler.createResponse(books);
+        }
+
+        Book book = bookService.getBookById(id);
+
+        return ResponseHandler.createResponse(book);
     }
+
 
     @PostMapping("/book")
     public ResponseEntity<Object> save(@RequestBody SaveBookRequest body){

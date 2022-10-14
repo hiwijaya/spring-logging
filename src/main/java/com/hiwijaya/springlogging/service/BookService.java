@@ -38,5 +38,10 @@ public class BookService {
         return bookRepository.findAll();
     }
 
+    public Book getBookById(Integer bookId){
+
+        return bookRepository.findById(bookId).orElse(null);
+    }
+
 
 }
