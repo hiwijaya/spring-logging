@@ -33,15 +33,24 @@ public class LoggingFilter extends OncePerRequestFilter {
         filterChain.doFilter(requestWrapper, responseWrapper);
         long timeTaken = System.currentTimeMillis() - startTime;
 
-
-
         String requestBody = this.getStringValue(requestWrapper.getContentAsByteArray(), request.getCharacterEncoding());
         String responseBody = this.getStringValue(responseWrapper.getContentAsByteArray(), response.getCharacterEncoding());
 
         log.info("[API_REQUEST]: CLIENT_IP={} METHOD={}; URI={}; BODY={}; RESPONSE_CODE={}; RESPONSE={}; TIME_TAKEN={}",
-                this.getClientIp(request), request.getMethod(), request.getRequestURI(), requestBody, response.getStatus(), responseBody, timeTaken);
+                this.getClientIp(request), request.getMethod(), getRequestUriWithParams(request), requestBody, response.getStatus(), responseBody, timeTaken);
 
         responseWrapper.copyBodyToResponse();
+    }
+
+    private String getRequestUriWithParams(HttpServletRequest request){
+
+        String params = request.getQueryString();
+
+        if(params != null){
+            return  request.getRequestURI() + "?" + params;
+        }
+
+        return request.getRequestURI();
     }
 
     private String getStringValue(byte[] contentAsByteArray, String encoding){
