@@ -1,6 +1,9 @@
 package com.hiwijaya.springlogging.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -36,11 +39,55 @@ public class LoggingFilter extends OncePerRequestFilter {
         String requestBody = this.getStringValue(requestWrapper.getContentAsByteArray(), request.getCharacterEncoding());
         String responseBody = this.getStringValue(responseWrapper.getContentAsByteArray(), response.getCharacterEncoding());
 
-        log.info("[API_REQUEST]: CLIENT_IP={} METHOD={}; URI={}; BODY={}; RESPONSE_CODE={}; RESPONSE={}; TIME_TAKEN={}",
-                this.getClientIp(request), request.getMethod(), getRequestUriWithParams(request), requestBody, response.getStatus(), responseBody, timeTaken);
+        this.writeLog(
+                getClientIp(request),
+                request.getMethod(),
+                getRequestUriWithParams(request),
+                requestBody,
+                String.valueOf(response.getStatus()),
+                timeTaken);
 
         responseWrapper.copyBodyToResponse();
     }
+
+
+    private void writeLog(
+            String ip,
+            String method,
+            String uri,
+            String requestBody,
+            String responseStatus,
+            long timeTaken){
+
+        JSONObject info = new JSONObject();
+        info.put("IP_ADDRESS", ip);
+        info.put("METHOD", method);
+        info.put("URI", uri);
+        info.put("BODY", safelyJson(requestBody));
+        info.put("RESPONSE_STATUS", responseStatus);
+        info.put("TIME_TAKEN", timeTaken);
+
+
+        log.info("API request. {}", info.toString());
+
+    }
+
+    public Object safelyJson(String data) {
+        try {
+            return new JSONObject(data);
+        } catch (JSONException e) {
+            try {
+                return new JSONArray(data);
+            } catch (JSONException ne) {
+                return "";
+            }
+        }
+    }
+
+
+
+
+
 
     private String getRequestUriWithParams(HttpServletRequest request){
 
